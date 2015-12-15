@@ -1,3 +1,5 @@
+import os
+import re
 from django.db import models
 
 from multi_email_field.forms import MultiEmailField as MultiEmailFormField
@@ -6,13 +8,14 @@ from multi_email_field.forms import MultiEmailField as MultiEmailFormField
 class MultiEmailField(models.Field):
     description = "A multi e-mail field stored as a multi-lines text"
 
-    separator = "\n"
+    separator = os.linesep
 
     __metaclass__ = models.SubfieldBase
 
     def __init__(self, **kwargs):
         if 'separator' in kwargs:
             self.separator = kwargs['separator']
+            del kwargs['separator']
         return super(MultiEmailField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
@@ -34,7 +37,7 @@ class MultiEmailField(models.Field):
         if isinstance(value, list):
             return value
 
-        return value.split(self.separator)
+        return [re.sub(r'[\s]*', "", v)  for v in value.split(self.separator) if re.sub(r'[\s]*', "", v)  != ""]
 
     def get_internal_type(self):
         return 'TextField'

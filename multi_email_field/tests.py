@@ -1,3 +1,5 @@
+import os
+
 from pyquery import PyQuery as pq
 
 from django.test import SimpleTestCase
@@ -9,12 +11,17 @@ from multi_email_field.widgets import MultiEmailWidget
 
 class MultiEmailFormFieldTest(SimpleTestCase):
 
+    separator = os.linesep
+
+    def _get_form_field(self, **kwargs):
+        return MultiEmailFormField(**kwargs)
+
     def test__widget(self):
-        f = MultiEmailFormField()
+        f = self._get_form_field()
         self.assertIsInstance(f.widget, MultiEmailWidget)
 
     def test__to_python(self):
-        f = MultiEmailFormField()
+        f = self._get_form_field()
         # Empty values
         for val in ['', None]:
             self.assertEquals([], f.to_python(val))
@@ -22,12 +29,12 @@ class MultiEmailFormFieldTest(SimpleTestCase):
         val = '  foo@bar.com    '
         self.assertEquals(['foo@bar.com'], f.to_python(val))
         # Multi lines correct values (test of #0010614)
-        val = 'foo@bar.com\nfoo2@bar2.com\r\nfoo3@bar3.com'
+        val = 'foo@bar.com' + self.separator + 'foo2@bar2.com\r' + self.separator + 'foo3@bar3.com'
         self.assertEquals(['foo@bar.com', 'foo2@bar2.com', 'foo3@bar3.com'],
                           f.to_python(val))
 
     def test__validate(self):
-        f = MultiEmailFormField(required=True)
+        f = self._get_form_field(required=True)
         # Empty value
         val = []
         self.assertRaises(ValidationError, f.validate, val)
@@ -45,7 +52,17 @@ class MultiEmailFormFieldTest(SimpleTestCase):
         f.validate(val)
 
 
+class MultiEmailFormFieldWithCustomSeparatorTest(MultiEmailFormFieldTest):
+
+    separator = ","
+
+    def _get_form_field(self, **kwargs):
+        return MultiEmailFormField(separator=self.separator, **kwargs)
+
+
 class MultiEmailWidgetTest(SimpleTestCase):
+
+    separator = os.linesep
 
     def test__prep_value__empty(self):
         w = MultiEmailWidget()
@@ -54,13 +71,13 @@ class MultiEmailWidgetTest(SimpleTestCase):
 
     def test__prep_value__string(self):
         w = MultiEmailWidget()
-        value = w.prep_value('foo@foo.fr\nbar@bar.fr')
-        self.assertEqual(value, 'foo@foo.fr\nbar@bar.fr')
+        value = w.prep_value('foo@foo.fr' + self.separator + 'bar@bar.fr')
+        self.assertEqual(value, 'foo@foo.fr' + self.separator + 'bar@bar.fr')
 
     def test__prep_value__list(self):
         w = MultiEmailWidget()
         value = w.prep_value(['foo@foo.fr', 'bar@bar.fr'])
-        self.assertEqual(value, 'foo@foo.fr\nbar@bar.fr')
+        self.assertEqual(value, 'foo@foo.fr' + self.separator + 'bar@bar.fr')
 
     def test__prep_value__raise(self):
         w = MultiEmailWidget()
@@ -72,4 +89,4 @@ class MultiEmailWidgetTest(SimpleTestCase):
         self.assertEqual(1, len(pq('textarea', output)))
         self.assertEqual(
             pq('textarea', output).text(),
-            'foo@foo.fr\nbar@bar.fr')
+            'foo@foo.fr' + self.separator + 'bar@bar.fr')

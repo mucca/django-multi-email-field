@@ -1,3 +1,6 @@
+import os
+import re
+
 from django import forms
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -11,13 +14,21 @@ class MultiEmailField(forms.Field):
     code = 'invalid'
     widget = MultiEmailWidget
 
+    separator = os.linesep
+
+    def __init__(self, **kwargs):
+        if 'separator' in kwargs:
+            self.separator = kwargs['separator']
+            del kwargs['separator']
+        return super(MultiEmailField, self).__init__(**kwargs)
+
     def to_python(self, value):
         "Normalize data to a list of strings."
         # Return None if no input was given.
         if not value:
             return []
 
-        return [v.strip() for v in value.split(self.separator) if v.strip() != ""]
+        return [re.sub(r'[\s]*', "", v)  for v in value.split(self.separator) if re.sub(r'[\s]*', "", v)  != ""]
 
     def validate(self, value):
         "Check if value consists only of valid emails."

@@ -1,3 +1,4 @@
+import os
 import six
 
 from django.forms.widgets import Textarea
@@ -10,6 +11,13 @@ MULTI_EMAIL_FIELD_EMPTY_VALUES = validators.EMPTY_VALUES + ('[]', )
 class MultiEmailWidget(Textarea):
 
     is_hidden = False
+    separator = os.linesep
+
+    def __init__(self, **kwargs):
+        if 'separator' in kwargs:
+            self.separator = kwargs['separator']
+            del kwargs['separator']
+        return super(MultiEmailWidget, self).__init__(**kwargs)
 
     def prep_value(self, value):
         """ Prepare value before effectively render widget """
