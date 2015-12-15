@@ -3,7 +3,7 @@ Field and widget to store a list of e-mail addresses in a `Django <https://www.d
 It provides:
 
 * A form field and a form widget to edit a list of e-mails in a Django form;
-* A model field to store the captured list of e-mails;
+* A model field to store the captured list of e-mails with custom separator;
 
 ==================
 COMPATIBILITY
@@ -11,16 +11,6 @@ COMPATIBILITY
 
 * Python 2.6/2.7/3.2/3.3/3.4
 * Django 1.4/1.5/1.6/1.7
-
-==================
-INSTALL
-==================
-
-For now:
-
-::
-
-    pip install django-multi-email-field
 
 ==================
 USAGE
@@ -45,7 +35,7 @@ USAGE
     from multi_email_field.forms import MultiEmailField
 
     class SendMessageForm(forms.Form):
-        emails = MultiEmailField()
+        emails = MultiEmailField([, separator='string'])
 
 ==================
 IN YOUR MODELS
@@ -59,17 +49,17 @@ If you wan to store list of e-mails, you can use this:
     from multi_email_field.fields import MultiEmailField
 
     class ContactModel(models.Model):
-        emails = MultiEmailField()
+        emails = MultiEmailField([, separator='string'])
 
 
 ==================
 AUTHORS
 ==================
 
+    * Ivan Bettarini <ivan.bettarini@gmail.com>
+
+    * forked from https://github.com/fle/django-multi-email-field
+
     * Florent Lebreton <florent.lebreton@makina-corpus.com>
 
-|makinacom|_
-
-.. |makinacom| image:: http://depot.makina-corpus.org/public/logo.gif
-.. _makinacom:  http://www.makina-corpus.com
 
