@@ -6,7 +6,14 @@ from multi_email_field.forms import MultiEmailField as MultiEmailFormField
 class MultiEmailField(models.Field):
     description = "A multi e-mail field stored as a multi-lines text"
 
+    separator = "\n"
+
     __metaclass__ = models.SubfieldBase
+
+    def __init__(self, **kwargs):
+        if 'separator' in kwargs:
+            self.separator = kwargs['separator']
+        return super(MultiEmailField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         # This is a fairly standard way to set up some defaults
@@ -19,14 +26,15 @@ class MultiEmailField(models.Field):
         if isinstance(value, str):
             return value
         elif isinstance(value, list):
-            return "\n".join(value)
+            return self.separator.join(value)
 
     def to_python(self, value):
         if not value:
             return []
         if isinstance(value, list):
             return value
-        return value.splitlines()
+
+        return value.split(self.separator)
 
     def get_internal_type(self):
         return 'TextField'
