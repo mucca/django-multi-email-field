@@ -60,6 +60,6 @@ AUTHORS
 
     * forked from https://github.com/fle/django-multi-email-field
 
-    * Florent Lebreton <florent.lebreton@makina-corpus.com>
+    * by Florent Lebreton <florent.lebreton@makina-corpus.com>
 
 
