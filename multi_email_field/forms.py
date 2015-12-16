@@ -16,11 +16,11 @@ class MultiEmailField(forms.Field):
 
     separator = os.linesep
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         if 'separator' in kwargs:
             self.separator = kwargs['separator']
             del kwargs['separator']
-        return super(MultiEmailField, self).__init__(**kwargs)
+        return super(MultiEmailField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
         "Normalize data to a list of strings."

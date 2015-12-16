@@ -19,6 +19,15 @@ class MultiEmailField(CharField):
         self.separator = separator
         super(MultiEmailField, self).__init__(*args, **kwargs)
 
+    # def from_native(self, value):
+
+    # def to_native(self, value):
+
+    def validate(self, value):
+        super(MultiEmailField, self).validate(value)
+        form = self.form_field_class(separator=self.separator)
+        form.validate(form.to_python(value))
+
 # class CharField(WritableField):
 #     type_name = 'CharField'
 #     type_label = 'string'
