@@ -19,32 +19,17 @@ class MultiEmailField(CharField):
         self.separator = separator
         super(MultiEmailField, self).__init__(*args, **kwargs)
 
-    # def from_native(self, value):
-
-    # def to_native(self, value):
+    def to_native(self, value):
+        if isinstance(value, str):
+            return value
+        elif isinstance(value, type([])):
+            return '{} '.format(self.separator).join(value)
+        return value
 
     def validate(self, value):
         super(MultiEmailField, self).validate(value)
         form = self.form_field_class(separator=self.separator)
         form.validate(form.to_python(value))
-
-# class CharField(WritableField):
-#     type_name = 'CharField'
-#     type_label = 'string'
-#     form_field_class = forms.CharField
-
-#     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-#         self.max_length, self.min_length = max_length, min_length
-#         super(CharField, self).__init__(*args, **kwargs)
-#         if min_length is not None:
-#             self.validators.append(validators.MinLengthValidator(min_length))
-#         if max_length is not None:
-#             self.validators.append(validators.MaxLengthValidator(max_length))
-
-#     def from_native(self, value):
-#         if isinstance(value, six.string_types) or value is None:
-#             return value
-#         return smart_text(value)
 
 
 ModelSerializer.field_mapping.update({fields.MultiEmailField: MultiEmailField})
